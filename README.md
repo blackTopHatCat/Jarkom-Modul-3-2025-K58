@@ -763,3 +763,47 @@ Bukti reverse proxy sedang bekerja.
 
 <img src="img/12.jpg" />
 <img src="img/13.jpg" />
+
+
+## No 11
+**soal**
+Musuh mencoba menguji kekuatan pertahanan Númenor. Dari node client, luncurkan serangan benchmark (ab) ke elros.<xxxx>.com/api/airing/:
+Serangan Awal: -n 100 -c 10 (100 permintaan, 10 bersamaan).
+Serangan Penuh: -n 2000 -c 100 (2000 permintaan, 100 bersamaan). Pantau kondisi para worker dan periksa log Elros untuk melihat apakah ada worker yang kewalahan atau koneksi yang gagal.
+Strategi Bertahan: Tambahkan weight dalam algoritma, kemudian catat apakah lebih baik atau tidak.
+
+**Penjelasan** lakukan ab benchmark dari node miriel
+```
+pre requisite :
+apt upddate, apt install apache2-utils
+
+run:
+ab  n 100 -c 10 k58.com/api/airing/
+hasil:
+<img width="931" height="673" alt="image" src="https://github.com/user-attachments/assets/22eb8275-cb45-4cc9-b6f3-89b0a4e74dfb" />
+
+ab -n 2000 -c 100 k58.com/api/airing/
+hasil:
+<img width="906" height="639" alt="image" src="https://github.com/user-attachments/assets/2272a7c2-36f7-49e2-9e36-c0ae05c33826" />
+
+
+di elros run :
+cat /var/log/nginx/error.log
+
+<img width="905" height="643" alt="image" src="https://github.com/user-attachments/assets/0340d657-c3b4-4ea7-a7bd-2d47bc4feb6b" />
+
+tambahkan weight dalam algoritma
+di
+/etc/nginx/sites-available/lb.conf
+menjadi =
+upstream laravel {
+    server 192.240.1.2:8001 weight=3; # Elendil
+    server 192.240.1.3:8002 weight=2; # Isildur
+    server 192.240.1.4:8003 weight=1; # Anarion
+}
+
+lakukan benchmark ulang
+hasil ab -n 2000 -c 100 k58.com/api/airing/ setelah pergantian weight
+<img width="902" height="643" alt="image" src="https://github.com/user-attachments/assets/9659f051-cc59-4431-8926-15e8c36388db" />
+
+```
